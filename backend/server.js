@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 const PORT = process.env.PORT || 5000;
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ["https://aquamarine-mousse-c308c4.netlify.app/", 'http://localhost:5173'],
   credentials: true
 }));
 app.use(cookieParser())
