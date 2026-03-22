@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+<<<<<<< HEAD
 const OrderSchema = mongoose.Schema({
     
     Orderby: {
@@ -31,3 +32,27 @@ const OrderSchema = mongoose.Schema({
 }, { timestamps: true });
 
 export const Order = mongoose.model('Order', OrderSchema);
+=======
+const orderSchema = new mongoose.Schema({
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+    },
+    books:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Prodect"  
+    }],
+    totalPrice:{
+        type:Number,
+        required:true,
+    },
+    status:{
+        type:String,
+        enum:["Pending","Shipped","Delivered","Cancelled"],
+        default:"Pending"
+    }
+
+},{timestamps:true});
+
+export const OrderModel = mongoose.model('Order',orderSchema);
+>>>>>>> 8b5693da49838ff7bd6a6e720bed888783bef530
