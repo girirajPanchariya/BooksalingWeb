@@ -43,12 +43,4 @@ export const ProdectOrder = async(req,res)=>{
 }
 
 
-export const pordectOrder = async(req,res)=>{
-        try {
-                const ProdectId = req.params;
 
-            const order = await ProdectId.findById(ProdectId).populate('')
-        } catch (error) {
-            
-        }
-}
