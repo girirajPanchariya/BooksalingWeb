@@ -42,5 +42,13 @@ export const ProdectOrder = async(req,res)=>{
         }
 }
 
+export const prodectOrder = async(req,res)=>{
+        try {
+            const prodectId = req.params
+        } catch (error) {
+            
+        }
+}
+
 
 
