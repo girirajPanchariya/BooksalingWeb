@@ -1,6 +1,6 @@
 import express from 'express'
-import { Authentication } from '../Others/Authenication.js'
 import { ProdectOrder } from '../Controller/OrderController.js'
+import { Authentication } from '../Other/Authenitication.js'
 
 export const OrderRouter = express.Router()
 

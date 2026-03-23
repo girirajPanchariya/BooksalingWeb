@@ -1,10 +1,11 @@
+
 import express from 'express'
-import { mongooseConection } from './Others/Database.js';
 import dotenv from 'dotenv'
-import { UserRouter } from './Router/UserRouter.js';
 import cookieParser from 'cookie-parser';
-import { ProdectRouter } from './Router/ProdectRouter.js';
 import path from 'path'
+import { mongooseConection } from './Other/DBConecton.js';
+import { UserRouter } from './Router/UserRouter.js';
+import { ProdectRouter } from './Router/ProdectRouter.js';
 import { OrderRouter } from './Router/OrderRouter.js';
 dotenv.config()
 
@@ -24,4 +25,4 @@ const PORT = 5000
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
     mongooseConection()
-})
+    })

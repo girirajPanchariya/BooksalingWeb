@@ -1,7 +1,7 @@
 import express from 'express'
-import { Authentication } from '../Others/Authenication.js'
 import { getAllprodect, postProdect, prodect, UserPost } from '../Controller/prodectController.js'
-import { upload } from '../Others/multer.js'
+import { Authentication } from '../Other/Authenitication.js'
+import { upload } from '../Other/multer.js'
 
 export const ProdectRouter = express.Router()
 

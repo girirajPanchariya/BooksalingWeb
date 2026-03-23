@@ -1,159 +1,260 @@
-import { UserModel } from "../Model/UserModel.js";
-import { OTPgenreate, sendVerificationEmail, strogae } from "../Other/EmailVerification.js";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-export const RegisterUser = async(req, res) => { 
+import { User } from "../Model/UserModel.js";
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import { getOtp, otpStore, sendEmail } from "../Other/EmailVerification.js";
 
-    try {
-        const {email,password,name,phone,otp,profile} = req.body;
-
-        if(!email || !password || !name || !phone || !otp){
-            return res.status(400).json({ message: "All fields are required" });
-        }
-
-        const storedOtp = strogae.get(email);
-
-        if(storedOtp.otp != otp){
-            return res.status(400).json({ message: "Invalid OTP" });
-        }
-        if(storedOtp.expiry < Date.now()){
-            return res.status(400).json({ message: "OTP expired" });
-        }
-
-        const exitingUser = await UserModel.findOne({ email });
-
-        if(exitingUser){
-            return res.status(400).json({ message: "User already exists" });
-        }
-
-        const hashpassword = await bcrypt.hash(password, 10);
-
-        const newUser = new UserModel({
-            email,
-            password:hashpassword,
-            name,
-            phone,
-            profile
-        });
-
-        await newUser.save();
-            strogae.delete(email);
-        return res.status(200).json({ message: "User registered successfully",newUser });
-
-    } catch (error) {
-        
-    }
-}
-
-
-export const VerifyEmail = async(req, res) => {
-
-    try {
-        const { email} = req.body;
-
-        
-        if(!email){
-            return res.status(400).json({ message: "Email is required" });
-        }
-        const otp = OTPgenreate();
-    const expiry = Date.now() + 5 * 60 * 1000; // OTP valid for 5 minutes
-        strogae.set(email, { otp, expiry });
-
-    await sendVerificationEmail(email, otp)
-
-            return res.status(200).json({ message: "OTP sent to email" });  
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Server Error" });
-        
-
-    }
-}
-
-export const LoginUser = async(req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        if(!email || !password){
-            return res.status(400).json({ message: "All fields are required" });
-        }
-
-        const user = await UserModel.findOne({ email });
-
-        if(!user){
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        if(!passwordMatch){
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-        const token = jwt.sign({ userId:user._id},process.env.JWT_SECRET,{ expiresIn:'1h' });
-
-        res.cookie('token',token,{
-            httpOnly:true,
-            secure:process.env.NODE_ENV === 'production',
-            sameSite:'strict',
-            maxAge:3600000
-        });
-
-        return res.status(200).json({ message: "Login successful", user, token });
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Server Error" });
-    }
-}
-
-export const logout = async(req, res) => {
+export const Register = async (req, res) => {
   try {
-    // Get user from req.user (set by auth middleware)
-    const userId = req.user.userId;
+    const { email, name, address, phoneNo, prodect, password, otp } = req.body;
 
-    const user = await UserModel.findById(userId).select('name');
+    // 1️⃣ Email required
+    if (!email) {
+      return res.status(400).json({
+        message: "Email is required"
+      });
+    }
 
-    // Clear the JWT cookie
-    res.clearCookie("token", {
-      httpOnly: true,
-      sameSite: "strict", // must match login cookie
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
+    // 2️⃣ If OTP not provided → generate & send OTP
+    if (!otp) {
+      const generateOtp = getOtp();
+
+      otpStore.set(email, {
+        otp: generateOtp,
+        expire: Date.now() + 10 * 60 * 1000 // 10 minutes
+      });
+
+      await sendEmail(email, generateOtp);
+
+      return res.status(200).json({
+        message: "OTP sent to email"
+      });
+    }
+
+    // 3️⃣ Validate all fields for registration
+    if (!name || !address || !phoneNo  || !password) {
+      return res.status(400).json({
+        message: "All fields are required"
+      });
+    }
+
+    // 4️⃣ Check stored OTP
+    const store = otpStore.get(email);
+
+    if (!store) {
+      return res.status(400).json({
+        message: "OTP not found or expired"
+      });
+    }
+
+    if (store.otp !== otp) {
+      return res.status(400).json({
+        message: "OTP does not match"
+      });
+    }
+
+    if (store.expire < Date.now()) {
+      return res.status(400).json({
+        message: "OTP expired"
+      });
+    }
+
+    // 5️⃣ Check existing user
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        message: "User already exists"
+      });
+    }
+
+    // 6️⃣ Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 7️⃣ Save user
+    const user = new User({
+      email,
+      name,
+      address,
+      phoneNo,
+      prodect,
+      password: hashedPassword
     });
 
-    if (user && user.name) {
-      return res.status(200).json({
-        message: `Logout successful. Goodbye, ${user.name}!`,
-        name: user.name,
+    await user.save();
 
-      });
-    } else {
-      return res.status(200).json({
-        message: "Logout successful.",
-      });
-    }
+    // 8️⃣ Clear OTP
+    otpStore.delete(email);
+
+    return res.status(201).json({
+      message: "User registered successfully",
+      user
+    });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      message: "Server error",
+      message: "Server error"
     });
   }
 };
 
 
-export const GetUserProfile = async(req,res)=>{
-    try {
-        const userId  = req.user.userId;
+// export const senmail = async(req,res)=>{
+//         try {
+//                 const {email} = req.body
 
-        const user = await UserModel.findById(userId).select('-password');
+//                 if(!email){
+//                         return res.status(400).json({
+//                             message:"email not found"
+//                         })
+//                 }
+//                 const genret =  getOtp()
 
-        if(!user){
-            return res.status(404).json({ message: "User not found" });
+//                     otpStore(email,{
+//                             otp:genret,
+//                             expire:now.Dae(t)+10 *60 *1000
+//                     })
+
+//                     await sendEmail(email,genret);
+
+//                     return res.status(200).json({
+//                         message:'email is verified'
+//                     })
+
+
+//         } catch (error) {
+//             console.log(error);
+            
+//         }
+// }
+
+export const LogintUser  = async(req,res)=>{
+        try {
+            const {email,password} = req.body
+                const user = await User.findOne({email})
+
+                if(!user){
+                  return res.status(400).json({
+                    message:"user not register"
+                  })
+                }
+                if(!email || !password){
+                    return res.status(400).json({
+                        message:'All fileds are required'
+                    })
+                }
+            const passwordmatch = await bcrypt.compare(password, user.password)
+
+            const token = jwt.sign({ Id: user.id }, process.env.JWT_SCREAT_KEY, { expiresIn: '1d' })
+
+            res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    })
+
+    // 6️⃣ Success response
+    return res.status(200).json({
+      message: "Login successful",
+      user: {
+        id: user._id,
+        email: user.email,
+        token
+
+      }
+    })
+
+        } catch (error) {
+            console.log(error);
+            return res.status(400).json({
+                message:`login internal ${error}`
+            })
+            
         }
-        return res.status(200).json({ user });
+}
+
+export const  LogoutUser  = async(req,res)=>{
+
+    try {
+    
+        return res.clearCookie('token',{
+            maxAge:0,
+            sameSite:'strict'
+            
+        }).status(200).json({
+            message:` is Logout Succesfully `
+        })
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ message: "Server Error" });
         
     }
+}
+export const UserProfile = async(req,res)=>{
+    try {
+        const userId = req.user.Id;
+        
+        if(!userId){
+            return res.status(400).json({
+                message:"any user is not login"
+            })
+        }
+
+        const userProfile = await User.findById(userId)
+            
+        if(!userProfile){
+            return res.status(400).json({
+                message:"the user is not found"
+            })
+        }
+        return res.status(200).json({
+            message:`This is the my user ${userProfile.name}`,
+            userProfile
+
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message:`This is userProfile internale error`
+        })
+        
+    }
+}
+
+export const UpdateUser = async(req,res)=>{
+
+      try {
+          const user = req.user.Id;
+           const { email, name, address, phoneNo, prodect, password, otp } = req.body;
+
+           
+          
+
+           const data = { email, name, address, phoneNo, prodect, password, otp };
+
+          
+
+           const updateUser = await User.findByIdAndUpdate(user,data,{new:true})
+
+           if(!updateUser){
+            return res.status(400).json({
+              message:"there update error || user not login"
+            })
+           }
+
+           return res.status(200).json({
+            message:"user is update",
+            updateUser
+           })
+           
+      } catch (error) {
+        console.log(error);
+
+        return res.status(400).json({
+          message:"internal error update User",
+          error:error
+        })
+        
+      }
+
 }
