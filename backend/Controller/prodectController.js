@@ -1,5 +1,6 @@
 import { log } from "console";
 import { Prodect } from "../Model/Prodect.js";
+import { Order } from "../Model/Order.js";
 
 export const postProdect = async (req, res) => {
 
@@ -31,7 +32,7 @@ export const postProdect = async (req, res) => {
 
 
 
-            newProdect.save()
+          await  newProdect.save()
 
             return res.status(200).json({
                 message:'this is posted prodect',
@@ -127,4 +128,33 @@ export const prodect = async(req,res)=>{
     }
 }
 
+export const prodectOrder = async (req, res) => {
+    try {
+        const { prodectid } = req.params;
 
+        if (!prodectid) {
+            return res.status(400).json({
+                message: "Product ID not provided"
+            });
+        }
+
+        const orders = await Order.find({ ProdecOrder: prodectid }).populate("Orderby");
+
+        if (orders.length === 0) {
+            return res.status(404).json({
+                message: "No orders found for this product"
+            });
+        }
+
+        return res.status(200).json({
+            message: "Product orders",
+            orders
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Internal error"
+        });
+    }
+};
