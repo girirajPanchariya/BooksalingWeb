@@ -221,40 +221,85 @@ export const UserProfile = async(req,res)=>{
     }
 }
 
-export const UpdateUser = async(req,res)=>{
 
-      try {
-          const user = req.user.Id;
-           const { email, name, address, phoneNo, prodect, password, otp } = req.body;
+export const UpdateUser = async (req, res) => {
+  try {
+    const userId = req.user.Id;
+    const { email, name, address, phoneNo, prodect, password, otp } = req.body;
 
-           
-          
+    const data = { email, name, address, phoneNo, prodect };
 
-           const data = { email, name, address, phoneNo, prodect, password, otp };
+    // ✅ If password update requested
+    if (password) {
 
-          
+      // STEP 1: Send OTP
+      if (!otp) {
+        const generateOtp = getOtp();
 
-           const updateUser = await User.findByIdAndUpdate(user,data,{new:true})
+        otpStore.set(email, {
+          otp: generateOtp,
+          expire: Date.now() + 10 * 60 * 1000
+        });
 
-           if(!updateUser){
-            return res.status(400).json({
-              message:"there update error || user not login"
-            })
-           }
+        await sendEmail(email, generateOtp);
 
-           return res.status(200).json({
-            message:"user is update",
-            updateUser
-           })
-           
-      } catch (error) {
-        console.log(error);
-
-        return res.status(400).json({
-          message:"internal error update User",
-          error:error
-        })
-        
+        return res.status(200).json({
+          message: "OTP sent to email"
+        });
       }
 
-}
+      // STEP 2: Verify OTP
+      const store = otpStore.get(email);
+
+      if (!store) {
+        return res.status(400).json({
+          message: "OTP not found or expired"
+        });
+      }
+
+      if (store.otp !== otp) {
+        return res.status(400).json({
+          message: "OTP does not match"
+        });
+      }
+
+      if (store.expire < Date.now()) {
+        return res.status(400).json({
+          message: "OTP expired"
+        });
+      }
+
+      // STEP 3: Hash password AFTER verification
+      const hashPassword = await bcrypt.hash(password, 10);
+      data.password = hashPassword;
+
+      // Clear OTP
+      otpStore.delete(email);
+    }
+
+    const updateUser = await User.findByIdAndUpdate(
+      userId,
+      data,
+      { new: true }
+    );
+
+    if (!updateUser) {
+      return res.status(400).json({
+        message: "User not found or not logged in"
+      });
+    }
+
+    return res.status(200).json({
+      message: "User updated successfully",
+      updateUser
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+      error
+    });
+  }
+};
