@@ -9,4 +9,4 @@ UserRouter.post('/Register',Register);
 UserRouter.post('/login',LogintUser);
 UserRouter.get('/logout',Authentication,LogoutUser)
 UserRouter.get('/profile',Authentication,UserProfile)
-// UserRouter.put('/update',Authentication,UpdateUser)
+UserRouter.put('/update',Authentication,UpdateUser)
