@@ -1,6 +1,7 @@
 import { log } from "console";
 import { Prodect } from "../Model/Prodect.js";
 import { Order } from "../Model/Order.js";
+import { User } from "../Model/UserModel.js";
 
 export const postProdect = async (req, res) => {
 
@@ -21,6 +22,20 @@ export const postProdect = async (req, res) => {
                     message:"plese fill the all detaild"
                 })
             }
+                const loginguser = await User.findById(userId)
+            const existingProdect = await Prodect.findOne({
+                ProdecName,
+                ProdecDetail,
+                ProdecPrice,
+                userPost:userId
+            })
+
+
+            if(existingProdect){
+                return res.status(400).json({
+                    message:`this prodect is exiting by this user ${loginguser.email}`
+                })
+            }
 
             const newProdect = await  Prodect({
                     Image:ImagePath,
@@ -30,6 +45,8 @@ export const postProdect = async (req, res) => {
                     userPost:userId
             })
 
+
+            
 
 
           await  newProdect.save()

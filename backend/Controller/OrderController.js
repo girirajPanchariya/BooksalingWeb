@@ -17,6 +17,17 @@ export const ProdectOrder = async(req,res)=>{
                 })
             }
             
+            const existingOrder = await Order.findOne({
+                Orderby:userId,
+                ProdecOrder:ProdectId
+            })
+
+            if(existingOrder){
+                return res.status(400).json({
+                    message:"User is alredy Order this prodect"
+                })
+            }
+
             const order = await new Order({
                     Orderby:userId,
                     ProdecOrder:ProdectId,
