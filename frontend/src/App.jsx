@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Home from './Componet/Home'
 import Register from './Componet/pages/Register'
 import UserProdefile from './Componet/pages/UserProdefile'
+import Login from './Componet/pages/Login'
 
 const App = () => {
 
@@ -14,13 +15,18 @@ const AppRouter = createBrowserRouter([
     },
 
     {
-      path:'/login',
+      path:'/Singup',
       element:<Register/>
     },
     {
-      path:'/Register',
+      path:'/UserProfile',
       element:<UserProdefile/>
     },
+    {
+      path:'/login',
+      element:<Login/>
+    }
+
 ]) 
 
   return (
