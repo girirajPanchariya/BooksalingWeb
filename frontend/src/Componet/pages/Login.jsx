@@ -1,5 +1,6 @@
 import React from 'react'
 import Header from '../Header'
+import { Link } from 'react-router-dom'
 
 const Login = () => {
   return (
@@ -14,14 +15,15 @@ const Login = () => {
             placeholder='Enter your Email'
             className='p-2 rounded border border-gray-400'
           />
-            <label className='font-semibold'>Password</label>
+            <label className='font-semibold mt-5'>Password</label>
           <input 
             type="password" 
             placeholder='Enter your password'
             className='p-2 rounded border border-gray-400'
           />
           
-          <button className='h-1/10 w-1/4 ml-35  flex justify-center items-center border border-black mt-10 bg-green-800 '>submit</button>
+          <button className='h-1/10 w-1/4 ml-35  flex justify-center items-center border border-black mt-10 bg-green-800 '>LoginUser</button>
+          <Link className="text-blue-900 ml-20 '" to="/Singup">You have no any Account? Register</Link>
           </form>
         </div>      
     </div>

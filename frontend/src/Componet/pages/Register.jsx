@@ -1,5 +1,6 @@
 import React from 'react'
 import Header from '../Header'
+import { Link } from 'react-router-dom'
 
 const Register = () => {
   return (
@@ -38,7 +39,8 @@ const Register = () => {
             placeholder='Enter your phone number'
             className='p-2 rounded border border-gray-400'
           />
-          <button className='h-1/10 w-1/4 ml-35  flex justify-center items-center border border-black mt-10 bg-green-300 '>submit</button>
+          <button className='h-1/10 w-1/4 ml-35  flex justify-center items-center border border-black mt-5 bg-green-300 '>Register</button>
+            <Link className=' text-blue-900 ml-20 ' to="/login">Already have an account? Login</Link>
           </form>
         </div>      
     </div>
