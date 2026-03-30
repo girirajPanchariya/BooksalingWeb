@@ -21,7 +21,7 @@ const Login = () => {
             className='p-2 rounded border border-gray-400'
           />
           
-          <button className='h-1/10 w-1/4 ml-35  flex justify-center items-center border border-black mt-10 bg-green-300 '>submit</button>
+          <button className='h-1/10 w-1/4 ml-35  flex justify-center items-center border border-black mt-10 bg-green-800 '>submit</button>
           </form>
         </div>      
     </div>
