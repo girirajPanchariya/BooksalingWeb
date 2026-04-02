@@ -7,12 +7,16 @@ import { mongooseConection } from './Other/DBConecton.js';
 import { UserRouter } from './Router/UserRouter.js';
 import { ProdectRouter } from './Router/ProdectRouter.js';
 import { OrderRouter } from './Router/OrderRouter.js';
+import cors from 'cors'
 dotenv.config()
 
 const app = express()
 app.use(express.json())
 app.use(cookieParser())
-
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}))
 // ✅ ADD THIS LINE
 app.use('/uploads', express.static('uploads'))
 

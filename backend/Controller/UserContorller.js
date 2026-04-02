@@ -5,7 +5,7 @@ import { getOtp, otpStore, sendEmail } from "../Other/EmailVerification.js";
 
 export const Register = async (req, res) => {
   try {
-    const { email, name, address, phoneNo, prodect, password, otp } = req.body;
+    const { email, Name, address, phoneNo, prodect, password, otp } = req.body;
 
     // 1️⃣ Email required
     if (!email) {
@@ -31,7 +31,7 @@ export const Register = async (req, res) => {
     }
 
     // 3️⃣ Validate all fields for registration
-    if (!name || !address || !phoneNo  || !password) {
+    if (!Name || !address || !phoneNo  || !password) {
       return res.status(400).json({
         message: "All fields are required"
       });
@@ -72,7 +72,7 @@ export const Register = async (req, res) => {
     // 7️⃣ Save user
     const user = new User({
       email,
-      name,
+      Name,
       address,
       phoneNo,
       prodect,
@@ -143,6 +143,11 @@ export const LogintUser  = async(req,res)=>{
                     })
                 }
             const passwordmatch = await bcrypt.compare(password, user.password)
+            if(!passwordmatch){
+                return res.status(400).json({
+                    message:"invalid password"
+                })
+            }
 
             const token = jwt.sign({ Id: user.id }, process.env.JWT_SCREAT_KEY, { expiresIn: '1d' })
 
@@ -207,7 +212,7 @@ export const UserProfile = async(req,res)=>{
             })
         }
         return res.status(200).json({
-            message:`This is the my user ${userProfile.name}`,
+            message:`This is the my user ${userProfile.Name} profile`,
             userProfile
 
         })
@@ -225,9 +230,9 @@ export const UserProfile = async(req,res)=>{
 export const UpdateUser = async (req, res) => {
   try {
     const userId = req.user.Id;
-    const { email, name, address, phoneNo, prodect, password, otp } = req.body;
+    const { email, Name, address, phoneNo, prodect, password, otp } = req.body;
 
-    const data = { email, name, address, phoneNo, prodect };
+    const data = { email, Name, address, phoneNo, prodect };
 
     // ✅ If password update requested
     if (password) {
