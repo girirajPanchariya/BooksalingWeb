@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Header from '../Header'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 const Register = () => {
 
@@ -12,6 +12,8 @@ const Register = () => {
     phoneNo: '',
     otp: ''
   })
+
+  const navigate = useNavigate()
 
 
    const handleChange = (e) => {
@@ -41,16 +43,12 @@ const Register = () => {
 
       alert(res.data.message)
 
-      setFormData({
-        email: '',
-        Name: '',
-        password: '',
-        address: '',
-        phoneNo: '',
-        otp: ''
-      })
+      setFormData(res.data.user)
 
+      navigate('/login')
     } catch (error) {
+      console.log(error);
+      
       alert(error.response?.data?.message)
     }
   

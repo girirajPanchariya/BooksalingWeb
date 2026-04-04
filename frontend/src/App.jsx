@@ -4,6 +4,7 @@ import Home from './Componet/Home'
 import Register from './Componet/pages/Register'
 import UserProdefile from './Componet/pages/UserProdefile'
 import Login from './Componet/pages/Login'
+import ProdectPost from './Componet/pages/ProdectPost'
 
 const App = () => {
 
@@ -25,6 +26,10 @@ const AppRouter = createBrowserRouter([
     {
       path:'/login',
       element:<Login/>
+    },
+    {
+        path:'/post',
+        element:<ProdectPost/>
     }
 
 ]) 

@@ -164,6 +164,7 @@ export const LogintUser  = async(req,res)=>{
       user: {
         id: user._id,
         email: user.email,
+        Name: user.Name,
         token
 
       }
@@ -288,6 +289,7 @@ export const UpdateUser = async (req, res) => {
       { new: true }
     );
 
+    await updateUser.save();
     if (!updateUser) {
       return res.status(400).json({
         message: "User not found or not logged in"
