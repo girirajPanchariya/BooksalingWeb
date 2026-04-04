@@ -1,4 +1,4 @@
-import axios from 'axios'
+ import axios from 'axios'
 import React, { useState } from 'react'
 
 const ProdectPost = () => {
@@ -48,6 +48,7 @@ const ProdectPost = () => {
                 }   
             )
 
+            
             alert(res.data.message)
 
             setProdect({
