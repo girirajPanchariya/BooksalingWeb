@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../UserContext/AuthContext'
 import axios from 'axios'
 import Header from '../Header'
+import { Link } from 'react-router-dom'
 
 const UserProfile = () => {
 
@@ -116,6 +117,8 @@ const [isEditing, setIsEditing] = useState(false)
           <button onClick={() => setIsEditing(true)} className='mt-5 w-full bg-green-400 hover:bg-green-500 text-white py-2 rounded-lg transition-all duration-300'>
             Edit Profile
           </button>
+
+          <button className='mt-5 w-full bg-green-400 hover:bg-green-500 text-white py-2 rounded-lg transition-all duration-300'><Link to="/UserPosted">Prodect && Order</Link></button>
 
           {isEditing && (
             <form onSubmit={handleSubmit} className='mt-5 space-y-4 text-left'>

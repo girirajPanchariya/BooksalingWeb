@@ -26,6 +26,6 @@ const ProdectSchema = mongoose.Schema({
         type:mongoose.Types.ObjectId,
         ref:'Order'
     },
-},{timetimestamps:true})
+},{timestamps:true})
 
 export const Prodect = mongoose.model('Prodect',ProdectSchema)

@@ -122,7 +122,7 @@ export const prodect = async(req,res)=>{
     try {
         const {id}= req.params;
 
-        const prodect  = await Prodect.findById(id);
+        const prodect  = await Prodect.findById(id).populate("Orderby");
 
         if(!prodect){
             return res.status(400).json({

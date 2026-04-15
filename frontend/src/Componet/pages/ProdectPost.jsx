@@ -1,5 +1,6 @@
  import axios from 'axios'
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const ProdectPost = () => {
 
@@ -9,7 +10,7 @@ const ProdectPost = () => {
         ProdecPrice: '',
         ProdecDetail: '',
     })
-
+        const navigation = useNavigate()
     // handle text input
     const handleChange = (e) => {
         setProdect({
@@ -22,7 +23,7 @@ const ProdectPost = () => {
     const handleFileChange = (e) => {
         setProdect({
             ...prodect,
-            Image: e.target.files[0]
+            Image: e.target.files[0] // ✅ get the first file
         })
     }
 
@@ -52,12 +53,14 @@ const ProdectPost = () => {
             alert(res.data.message)
 
             setProdect({
-                Image: null,
+                Image: '',
                 ProdecName: '',
                 ProdecPrice: '',
                 ProdecDetail: '',
             })
 
+            navigation('/')
+                
         } catch (error) {
             console.log(error)
             alert(error.response?.data?.message || "Error")
@@ -93,7 +96,7 @@ const ProdectPost = () => {
 
                 <label className='font-semibold'>Product Price</label>
                 <input
-                    type="text"
+                    type="Number"
                     name="ProdecPrice"
                     value={prodect.ProdecPrice}
                     onChange={handleChange}

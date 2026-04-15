@@ -10,9 +10,12 @@ const Header = () => {
   const handleLogout = async() => {
     try {
       const res = await axios.get('http://localhost:5000/user/logout', {
-        withCredentials:true
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials:true  
       })
-      logout()
+      // logout()
       alert(res.data.message)
      
     } catch (error) {
@@ -20,6 +23,8 @@ const Header = () => {
       alert(error.response?.data?.message)
       
     }
+    // this is good prectice for logout because this is for restatring over app the work prefectly
+    logout()
   }
   
   return (
@@ -35,6 +40,7 @@ const Header = () => {
  
       {/* User Section */}
       <div className='flex justify-end relative group'>
+        
 <h1>{user?.name || user?.Name || 'User'}</h1>
     <ul className=' absolute top-4 right-0 bg-white shadow-lg rounded-md w-32 opacity-0 hover:opacity-100 tra'>
         <li className='p-3 hover:cursor-pointer border-2  border-blue-300 rounded-lg bg-cover'><Link to="/login">Login</Link></li>
